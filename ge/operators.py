@@ -38,7 +38,7 @@ class NullFilter(_Operator):
 
     def call(self, depend_table=None):
         query = f"""
-            with {self.name} as (
+            {self.name} as (
                 select *
                 from {depend_table or self.params.graph_table}
                 where {self.params.src_col} is not null and {self.params.src_col} <> ''
@@ -61,7 +61,7 @@ class DateFilter(_Operator):
 
     def call(self, depend_table=None):
         query = f"""
-            with {self.name} as (
+            {self.name} as (
                 select *
                 from {depend_table or self.params.graph_table}
                 where {self.params.process_date_col} >= '{self.params.start_date}'
@@ -85,7 +85,7 @@ class AssetFilter(_Operator):
             ', '.join("'{}'".format(asset) for asset in self.params.assets)
         )
         query = f"""
-            with {self.name} as (
+            {self.name} as (
                 select *
                 from {depend_table or self.params.graph_table}
                 where {self.params.tgt_col} in {assets_query}
@@ -126,9 +126,9 @@ class AssetDegreeFilter(_Operator):
         filter_asset_script = '\nunion all\n'.join(filter_asset_script_list)
 
         query = f"""
-            with temp_{self.name} as (
+            temp_{self.name} as (
                 {filter_asset_script}
-            ), with {self.name} as (
+            ), {self.name} as (
                 select *
                 from {depend_table or self.params.graph_table} as t1
                 inner join temp_{self.name}  as t2 
@@ -152,7 +152,7 @@ class DropDuplicatesFilter(_Operator):
             group_by_list.append(self.params.asset_type_col)
 
         query = f"""
-            with {self.name} as (
+            {self.name} as (
                 select {', '.join(group_by_list)}
                 from {depend_table or self.params.graph_table}
                 group by {', '.join(group_by_list)}
@@ -172,7 +172,7 @@ class Acct2AssetMappingIdOperator(_Operator):
 
     def call(self, depend_table=None):
         query = f"""
-            with {self.name} as (
+            {self.name} as (
                 select t1.*
                        ,t2.{self.params.entity_id_col} as src_id
                        ,t3.{self.params.entity_id_col} as tgt_id
@@ -207,4 +207,5 @@ class OperatorPipeline:
             select *
             from {last_filter_name}
         """
-        return ', '.join(query) + select_query
+        final_query = 'with' + ', '.join(query) + select_query
+        return final_query
