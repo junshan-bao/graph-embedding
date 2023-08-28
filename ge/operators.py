@@ -196,16 +196,20 @@ class OperatorPipeline:
 
     def call(self):
         query = list()
-        last_filter_name = None
+        last_filter_name = self.params.graph_table
         for f in self.filters:
             if not isinstance(f, _Operator):
                 f = f(self.params)
             if f.check_params():
                 query.append(f.call(last_filter_name))
                 last_filter_name = f.name
+
+        start_query = 'with' if len(query) > 0 else ''
+        op_query = ', '.join(query)
         select_query = f"""
             select *
             from {last_filter_name}
         """
-        final_query = 'with' + ', '.join(query) + select_query
+
+        final_query = start_query + op_query + select_query
         return final_query
