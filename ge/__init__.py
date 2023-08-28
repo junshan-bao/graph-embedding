@@ -2,7 +2,6 @@ import sys
 import logging
 
 
-sys.stdout.reconfigure(encoding='utf-8')
 file = open('log.txt', encoding="utf-8", mode="w")
 logging.basicConfig(
     stream=file,
