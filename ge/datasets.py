@@ -33,8 +33,9 @@ class Acct2AssetDatasets(_Datasets):
         if self.verbose:
             logger.info('Start to fetch and process graph.')
         graph_query = self.op_pipeline.call()
-        self.db_connector.create_table(
-            table_name=self.data_params.save_db,
-            table_query=graph_query,
-            verbose=self.verbose,
-        )
+        print(graph_query)
+        # self.db_connector.create_table(
+        #     table_name=self.data_params.save_db,
+        #     table_query=graph_query,
+        #     verbose=self.verbose,
+        # )

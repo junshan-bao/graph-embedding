@@ -123,13 +123,13 @@ class AssetDegreeFilter(_Operator):
                 ) t
             """
             filter_asset_script_list.append(_script)
-        filter_asset_script = '\nunion all\n'.join(filter_asset_script_list)
+        filter_asset_script = '\n\t\tunion all\n'.join(filter_asset_script_list)
 
         query = f"""
             temp_{self.name} as (
                 {filter_asset_script}
             ), {self.name} as (
-                select *
+                select t1.*
                 from {depend_table or self.params.graph_table} as t1
                 inner join temp_{self.name}  as t2 
                 on t1.{self.params.asset_type_col}=t2.{self.params.asset_type_col}
