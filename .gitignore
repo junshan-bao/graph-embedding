@@ -1,5 +1,6 @@
 ge/__pycache__
 examples/__pycache__
+scripts/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
