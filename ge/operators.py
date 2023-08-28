@@ -88,7 +88,7 @@ class AssetFilter(_Operator):
             {self.name} as (
                 select *
                 from {depend_table or self.params.graph_table}
-                where {self.params.tgt_col} in {assets_query}
+                where {self.params.asset_type_col} in {assets_query}
             )
         """
         return query
@@ -120,7 +120,7 @@ class AssetDegreeFilter(_Operator):
                     where {self.params.asset_type_col} = '{asset}'
                     group by {self.params.asset_type_col}, {self.params.tgt_col}
                     having cnt >= {min_degree} and cnt <= {max_degree}
-                ) t
+                )
             """
             filter_asset_script_list.append(_script)
         filter_asset_script = '\n\t\tunion all\n'.join(filter_asset_script_list)
@@ -204,8 +204,8 @@ class OperatorPipeline:
                 query.append(f.call(last_filter_name))
                 last_filter_name = f.name
 
-        start_query = 'with' if len(query) > 0 else ''
-        op_query = ', '.join(query)
+        start_query = '\t\twith' if len(query) > 0 else ''
+        op_query = '\t, '.join(query)
         select_query = f"""
             select *
             from {last_filter_name}
