@@ -2,6 +2,7 @@ import abc
 import logging
 from typing import List, Union
 
+import pandas as pd
 import torch
 import dgl
 
@@ -60,11 +61,28 @@ class Acct2AssetDatasets(_Datasets):
         p = self.data_params
 
         df = self.db_connector.download_table(p.save_db)
-        df[p.src_col]
-        u = torch.tensor(df[self.data_params.src_col].values, dtype=torch.int64)
-        v = torch.tensor(df[self.data_params.tgt_col].values, dtype=torch.int64)
+
+        src_node_data = df[[p.src_id_col]].drop_duplicates().reset_index(drop=True)
+        src_node_data[p.tgt_type_col] = p.src_type_value
+        src_node_data = src_node_data.rename(columns={p.src_id_col: 'int_node_id', p.tgt_type_col: 'node_type'})
+
+        tgt_node_data = df[[p.tgt_id_col, p.tgt_type_col]].drop_duplicates().reset_index(drop=True)
+        tgt_node_data = tgt_node_data.rename(columns={p.tgt_id_col: 'int_node_id', p.tgt_type_col: 'node_type'})
+
+        node_data = pd.concat([src_node_data, tgt_node_data]).reset_index(drop=True)
+        nid_mapping = node_data.reset_index().set_index('int_node_id')['index']
+        type_mapping = {a: i for i, a in enumerate(p.assets)}
+        node_data['node_type_id'] = node_data['node_type'].map(type_mapping)
+
+        df[p.src_col] = df[p.src_col].map(nid_mapping)
+        df[p.tgt_col] = df[p.tgt_col].map(nid_mapping)
+
+        u = torch.tensor(df[p.src_col].values, dtype=torch.int64)
+        v = torch.tensor(df[p.tgt_col].values, dtype=torch.int64)
 
         g = dgl.graph((u, v))
+        g.ndata['nid'] = torch.tensor(node_data['int_node_id'].values, dtype=torch.int64)
+        g.ndata['tid'] = torch.tensor(node_data['node_type_id'].values, dtype=torch.int64)
         g = dgl.to_bidirected(g)
 
         if self.verbose:
