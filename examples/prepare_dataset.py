@@ -19,7 +19,7 @@ if __name__ == '__main__':
         graph_table='AP_CUR_R_FEATSCI.CURATED_FEATURE_SCIENCE_RED.acct2asset_alm',
         src_col='acct',
         tgt_col='asset_val',
-        asset_type_col='asset_name',
+        tgt_type_col='asset_name',
         entity_id_mapping_table='AP_CUR_R_FEATSCI.CURATED_FEATURE_SCIENCE_RED.acct2asset_entity_id_map_alm',
         entity_col='raw_node_id',
         entity_id_col='int_node_id',
@@ -55,7 +55,7 @@ if __name__ == '__main__':
 
     dataset = Acct2AssetDatasets(
         data_params=param,
-        filters=[
+        operators=[
             NullFilter,
             DateFilter,
             DropDuplicatesFilter,
@@ -67,7 +67,10 @@ if __name__ == '__main__':
         cs_connector=GCloudStorageConnector(),
     )
 
-    dataset.process()
+    print(dataset.data_params)
+    print(dataset.data_params.src_id_col, dataset.data_params.src_type_value)
+
+    # dataset.preprocess()
 
 
 

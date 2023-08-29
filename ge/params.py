@@ -1,6 +1,6 @@
 import hashlib
 import json
-from typing import List, Tuple
+from typing import List, Tuple, ClassVar
 from dataclasses import asdict, dataclass, field
 
 
@@ -11,10 +11,19 @@ class _Params:
 
 
 @dataclass(frozen=True)
-class _DataParams(_Params):
+class _DefaultParams:
+    src_type_value: ClassVar[str] = 'acct'
+    src_id_col: ClassVar[str] = 'src_id'
+    tgt_id_col: ClassVar[str] = 'tgt_id'
+
+
+@dataclass(frozen=True)
+class _DataParams(_Params, _DefaultParams):
     graph_table: str = None
     src_col: str = None
     tgt_col: str = None
+    src_type_col: str = None
+    tgt_type_col: str = None
     entity_id_mapping_table: str = None
     entity_col: str = None
     entity_id_col: str = None
@@ -38,13 +47,10 @@ class _SaveParams(_Params):
 
 @dataclass(frozen=True)
 class Acct2AssetDataParams(_DataParams, _FilterParams, _SaveParams):
-    acct_type_col: str = None
-    asset_type_col: str = None
+    pass
 
 
 @dataclass(frozen=True)
 class Acct2AcctDataParams(_DataParams, _FilterParams, _SaveParams):
     pass
-
-
 
