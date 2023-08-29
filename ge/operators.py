@@ -131,7 +131,7 @@ class AssetDegreeFilter(_Operator):
             ), {self.name} as (
                 select t1.*
                 from {depend_table or self.params.graph_table} as t1
-                inner join temp_{self.name}  as t2 
+                inner join temp_{self.name} as t2 
                 on t1.{self.params.asset_type_col}=t2.{self.params.asset_type_col}
                 and t1.{self.params.tgt_col}=t2.{self.params.tgt_col}
             )
@@ -190,21 +190,21 @@ class Acct2AssetMappingIdOperator(_Operator):
 
 
 class OperatorPipeline:
-    def __init__(self, filters: Union[List[_Operator], List[type]], params: _DataParams = None):
-        self.filters = filters
+    def __init__(self, operators: Union[List[_Operator], List[type]], params: _DataParams = None):
+        self.operators = operators
         self.params = params
 
     def call(self):
         query = list()
         last_filter_name = self.params.graph_table
-        for f in self.filters:
+        for f in self.operators:
             if not isinstance(f, _Operator):
                 f = f(self.params)
             if f.check_params():
                 query.append(f.call(last_filter_name))
                 last_filter_name = f.name
 
-        start_query = '\t\twith' if len(query) > 0 else ''
+        start_query = '\twith' if len(query) > 0 else ''
         op_query = '\t, '.join(query)
         select_query = f"""
             select *
