@@ -1,1 +1,1 @@
-from deepwalk import DeepWalk
+from ge.models.deepwalk import DeepWalk
