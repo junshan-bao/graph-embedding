@@ -51,7 +51,7 @@ class Acct2AssetDatasets(_Datasets):
             logger.info('Done: fetch and preprocess graph.')
         return self
 
-    def to_graph(self):
+    def to_dgl_graph(self):
         if not self._preprocessed:
             logger.warning('The dataset has not been preprocessed.')
             self.preprocess()
@@ -74,16 +74,16 @@ class Acct2AssetDatasets(_Datasets):
         type_mapping = {a: i for i, a in enumerate(p.assets)}
         node_data['node_type_id'] = node_data['node_type'].map(type_mapping)
 
-        df[p.src_col] = df[p.src_col].map(nid_mapping)
-        df[p.tgt_col] = df[p.tgt_col].map(nid_mapping)
+        df['dgl_' + p.src_id_col] = df[p.src_id_col].map(nid_mapping)
+        df['dgl_' + p.tgt_id_col] = df[p.tgt_id_col].map(nid_mapping)
 
-        u = torch.tensor(df[p.src_col].values, dtype=torch.int64)
-        v = torch.tensor(df[p.tgt_col].values, dtype=torch.int64)
+        u = torch.tensor(df['dgl_' + p.src_id_col].values, dtype=torch.int64)
+        v = torch.tensor(df['dgl_' + p.tgt_id_col].values, dtype=torch.int64)
 
         g = dgl.graph((u, v))
         g.ndata['nid'] = torch.tensor(node_data['int_node_id'].values, dtype=torch.int64)
         g.ndata['tid'] = torch.tensor(node_data['node_type_id'].values, dtype=torch.int64)
-        g = dgl.to_bidirected(g)
+        g = dgl.to_bidirected(g, copy_ndata=True)
 
         if self.verbose:
             logger.info(f'Done: build dgl graph.\nGraph statistics:\n{g}')
