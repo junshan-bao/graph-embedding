@@ -5,10 +5,10 @@ import pickle
 import numpy as np
 import dgl
 import tqdm
-import torch
 from gensim.models import Word2Vec
 from gensim.models.callbacks import CallbackAny2Vec
 
+from ge.models._base import _Model
 from ge.models.utils.walkers import RandomWalk
 from ge.utils import check_and_mkdir
 
@@ -38,7 +38,7 @@ class Callback(CallbackAny2Vec):
         self.epoch += 1
 
 
-class DeepWalk:
+class DeepWalk(_Model):
     def __init__(self, g: dgl.DGLGraph, walk_length: int = 200, window: int = 10, emb_size: int = 64,
                  batch_size: int = 1e7, epochs: int = 3, n_jobs: int = -1, verbose: bool = True):
         self.g = g
@@ -97,12 +97,6 @@ class DeepWalk:
         with open(path, 'wb') as f:
             pickle.dump(emb, f)
         return self
-
-    @staticmethod
-    def load_embedding(path):
-        with open(path, 'rb') as f:
-            emb = pickle.load(f)
-        return emb
 
     def save_model(self, path):
         check_and_mkdir(path)
