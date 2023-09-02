@@ -2,7 +2,7 @@ import time
 import logging
 import multiprocessing as mp
 import pickle
-import pathlib
+import numpy as np
 import dgl
 import tqdm
 import torch
@@ -85,7 +85,7 @@ class DeepWalk:
         return self
 
     def get_embedding(self):
-        emb = torch.zeros((self.g.num_nodes(), self.emb_size))
+        emb = np.zeros((self.g.num_nodes(), self.emb_size))
         for i in range(self.g.num_nodes()):
             emb[i, :] = self.model.wv[i]
         return emb
@@ -97,6 +97,12 @@ class DeepWalk:
         with open(path, 'wb') as f:
             pickle.dump(emb, f)
         return self
+
+    @staticmethod
+    def load_embedding(path):
+        with open(path, 'rb') as f:
+            emb = pickle.load(f)
+        return emb
 
     def save_model(self, path):
         check_and_mkdir(path)
