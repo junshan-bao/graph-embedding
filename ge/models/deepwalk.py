@@ -2,6 +2,7 @@ import time
 import logging
 import multiprocessing as mp
 import pickle
+import pathlib
 import dgl
 import tqdm
 import torch
@@ -9,6 +10,7 @@ from gensim.models import Word2Vec
 from gensim.models.callbacks import CallbackAny2Vec
 
 from ge.models.utils.walkers import RandomWalk
+from ge.utils import check_and_mkdir
 
 logger = logging.getLogger('ge')
 
@@ -90,11 +92,15 @@ class DeepWalk:
 
     def save_embedding(self, path):
         emb = self.get_embedding()
+
+        check_and_mkdir(path)
         with open(path, 'wb') as f:
             pickle.dump(emb, f)
         return self
 
     def save_model(self, path):
+        check_and_mkdir(path)
+
         self.model.save(path)
 
     def load_model(self, path):
