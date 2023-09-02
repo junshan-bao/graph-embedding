@@ -1,6 +1,7 @@
 import time
 import logging
 import multiprocessing as mp
+import pickle
 import dgl
 import tqdm
 import torch
@@ -83,12 +84,18 @@ class DeepWalk:
 
     def get_embedding(self):
         emb = torch.zeros((self.g.num_nodes(), self.emb_size))
-        for i in range(100):
+        for i in range(self.g.num_nodes()):
             emb[i, :] = self.model.wv[i]
         return emb
+
+    def save_embedding(self, path):
+        emb = self.get_embedding()
+        with open(path, 'wb') as f:
+            pickle.dump(emb, f)
+        return self
 
     def save_model(self, path):
         self.model.save(path)
 
     def load_model(self, path):
-        self.model.load(path)
+        self.model = Word2Vec.load(path)
