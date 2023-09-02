@@ -102,6 +102,7 @@ class DeepWalk(_Model):
         check_and_mkdir(path)
 
         self.model.save(path)
+        return self
 
     def load_model(self, path):
         self.model = Word2Vec.load(path)
