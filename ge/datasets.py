@@ -51,7 +51,12 @@ class Acct2AssetDatasets(_Datasets):
             logger.info('Done: fetch and preprocess graph.')
         return self
 
-    def to_dgl_graph(self):
+    def get_node_type_mapping(self):
+        type_mapping = {a: i + 1 for i, a in enumerate(self.data_params.assets)}
+        type_mapping[0] = self.data_params.src_type_value
+        return type_mapping
+
+    def get_dgl_graph(self):
         if not self._preprocessed:
             logger.warning('The dataset has not been preprocessed.')
             self.preprocess()
@@ -71,7 +76,7 @@ class Acct2AssetDatasets(_Datasets):
 
         node_data = pd.concat([src_node_data, tgt_node_data]).reset_index(drop=True)
         nid_mapping = node_data.reset_index().set_index('int_node_id')['index']
-        type_mapping = {a: i for i, a in enumerate(p.assets)}
+        type_mapping = self.get_node_type_mapping()
         node_data['node_type_id'] = node_data['node_type'].map(type_mapping)
 
         df['dgl_' + p.src_id_col] = df[p.src_id_col].map(nid_mapping)
