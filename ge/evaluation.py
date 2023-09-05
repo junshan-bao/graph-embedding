@@ -28,6 +28,7 @@ def kg_metrics(g: dgl.DGLGraph, emb: np.array, n_sample: int, batch: int = 100, 
         'HITS@1': sum([1 if r <= 1 else 0 for r in rank]) / len(rank),
         'HITS@3': sum([1 if r <= 3 else 0 for r in rank]) / len(rank),
         'HITS@10': sum([1 if r <= 10 else 0 for r in rank]) / len(rank),
+        '_rank': rank
     }
     return ret
 
@@ -65,6 +66,7 @@ def kg_metrics_cuda(g: dgl.DGLGraph, emb: np.array, n_sample: int, verbose: bool
         'HITS@1': sum([1 if r <= 1 else 0 for r in rank]) / len(rank),
         'HITS@3': sum([1 if r <= 3 else 0 for r in rank]) / len(rank),
         'HITS@10': sum([1 if r <= 10 else 0 for r in rank]) / len(rank),
+        '_rank': rank
     }
     return ret
 
