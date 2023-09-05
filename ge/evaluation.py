@@ -36,7 +36,7 @@ def kg_metrics_cuda(g: dgl.DGLGraph, emb: np.array, n_sample: int, verbose: bool
     rank = list()
     nodes = torch.randperm(g.num_nodes())[:n_sample]
     emb = torch.tensor(emb).to('cuda')
-    
+
     def get_similarity(node_id):
         res = list()
         b = 1000000

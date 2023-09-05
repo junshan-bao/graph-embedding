@@ -19,7 +19,7 @@ class RandomWalk:
         self.n_nodes = self.g.num_nodes()
 
     def _walk(self, nodes):
-        walk_path, _ = dgl.sampling.node2vec_random_walk(
+        walk_path = dgl.sampling.node2vec_random_walk(
             g=self.g,
             nodes=nodes,
             p=self.p,
