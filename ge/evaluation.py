@@ -33,10 +33,12 @@ def kg_metrics(g: dgl.DGLGraph, emb: np.array, n_sample: int, batch: int = 100, 
     return ret
 
 
-def kg_metrics_cuda(g: dgl.DGLGraph, emb: np.array, n_sample: int, verbose: bool = True) -> dict:
+def kg_metrics_cuda(g: dgl.DGLGraph, emb: np.array, n_sample: int, verbose: bool = True,
+                    device: str = 'cuda') -> dict:
     rank = list()
     nodes = torch.randperm(g.num_nodes())[:n_sample]
-    emb = torch.tensor(emb).to('cuda')
+    emb = torch.tensor(emb).to(device)
+    g = g.to(device)
 
     def get_similarity(node_id):
         res = list()
@@ -50,7 +52,7 @@ def kg_metrics_cuda(g: dgl.DGLGraph, emb: np.array, n_sample: int, verbose: bool
         return torch.cat(res, dim=1)[0]
 
     def get_rank(n):
-        ns = g.successors(n).to('cuda')
+        ns = g.successors(n)
         ds = get_similarity(n)
         nds = ds[ns]
         nds, _ = torch.sort(nds)
