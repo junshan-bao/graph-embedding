@@ -36,7 +36,7 @@ def kg_metrics(g: dgl.DGLGraph, emb: np.array, n_sample: int, batch: int = 100, 
 def kg_metrics_cuda(g: dgl.DGLGraph, emb: np.array, n_sample: int, verbose: bool = True,
                     device: str = 'cuda') -> dict:
     rank = list()
-    nodes = torch.randperm(g.num_nodes())[:n_sample]
+    nodes = torch.randperm(g.num_nodes())[:n_sample].to(device)
     emb = torch.tensor(emb).to(device)
     g = g.to(device)
 
